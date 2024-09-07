@@ -5,8 +5,8 @@ import App from "./app/app"
 
 SplashScreen.preventAutoHideAsync()
 
-function IgniteApp() {
+function ZellerInterviewApp() {
   return <App hideSplashScreen={SplashScreen.hideAsync} />
 }
 
-export default IgniteApp
+export default ZellerInterviewApp

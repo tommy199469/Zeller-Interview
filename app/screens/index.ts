@@ -1,3 +1,2 @@
-export * from "./WelcomeScreen"
-export * from "./ErrorScreen/ErrorBoundary"
+export * from "./CustomerScreen"
 // export other screens here
