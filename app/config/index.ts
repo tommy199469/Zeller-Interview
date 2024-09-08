@@ -23,6 +23,12 @@ if (__DEV__) {
   ExtraConfig = DevConfig
 }
 
-const Config = { ...BaseConfig, ...ExtraConfig }
+// share common env between different env
+const sharedConfig = {
+  graphqlEndpoint: process.env.GRAPHQL_ENDPOINT || "http://127.0.0.1:9002/",
+  graphqlApiKey: process.env.GRAPHQL_API_KEY || "",
+}
+
+const Config = { ...BaseConfig, ...ExtraConfig, ...sharedConfig }
 
 export default Config

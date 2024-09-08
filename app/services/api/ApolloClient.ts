@@ -1,16 +1,19 @@
 import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client"
 import { setContext } from "@apollo/client/link/context"
+import Config from "../../config"
 
+// set up the graphql link here
 const httpLink = createHttpLink({
-  uri: "http://127.0.0.1:9002/",
+  uri: Config.graphqlEndpoint,
 })
 
+// handle the api key
 const authLink = setContext((_, { headers }) => {
   const token = "your-auth-token" // Replace with your authentication token
   return {
     headers: {
       ...headers,
-      authorization: token ? `Bearer ${token}` : "",
+      "x-api-key": Config.graphqlApiKey ? `Bearer ${token}` : "",
     },
   }
 })
