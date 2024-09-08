@@ -13,14 +13,23 @@ interface CustomerScreenProps extends TabScreenProps<"Customer"> {}
 const userTypes: string[] = ["Admin", "Manager"]
 
 export const CustomerScreen: FC<CustomerScreenProps> = observer(function CustomerScreenScreen() {
+  // for the radio selection
   const [selectedUserType, setSelectedUserType] = useState<string>("Admin")
+
+  // set the initial customer list
   const [customers, setCustomers] = useState<ICustomer[]>([])
-  const [filteredCustomers, setFilteredCustomers] = useState<ICustomer[]>([]) // Adjusting type for filtered search results
-  const [searchText, setSearchText] = useState<string>("") // Search text state
+
+  // after searched customer list
+  const [filteredCustomers, setFilteredCustomers] = useState<ICustomer[]>([])
+
+  // the search text
+  const [searchText, setSearchText] = useState<string>("")
+
+  // for the pulling to update
   const [refreshing, setRefreshing] = useState(false)
 
   const { data, loading, error, refetch } = useQuery(getCustomerQuery, {
-    variables: { role: selectedUserType }, // Pass the role as a variable here
+    variables: { role: selectedUserType },
   })
 
   useEffect(() => {
@@ -30,13 +39,20 @@ export const CustomerScreen: FC<CustomerScreenProps> = observer(function Custome
         (item: ICustomer) => item.role === selectedUserType,
       )
       setCustomers(customerList)
-      setFilteredCustomers(customerList) // Initialize with full list
+      setFilteredCustomers(customerList)
+    }
+
+    // reset the data when unmount the component
+    return () => {
+      setCustomers([])
+      setFilteredCustomers([])
+      setSearchText("")
     }
   }, [data])
 
   // Filter customers based on the search text
   const filterCustomers = (text: string) => {
-    setSearchText(text) // Update the search text
+    setSearchText(text)
     if (text) {
       const filteredList = customers.filter((customer) =>
         customer.name.toLowerCase().includes(text.toLowerCase()),
@@ -47,6 +63,7 @@ export const CustomerScreen: FC<CustomerScreenProps> = observer(function Custome
     }
   }
 
+  // pull to update in the flat list
   const onRefresh = async () => {
     setRefreshing(true)
     try {
@@ -60,6 +77,7 @@ export const CustomerScreen: FC<CustomerScreenProps> = observer(function Custome
 
   return (
     <Screen preset="fixed" style={$container} safeAreaEdges={["top"]}>
+      {/* the radio selection */}
       <View style={$viewContainer}>
         <Text style={$title}>User Types</Text>
         <RadioGroup
@@ -72,6 +90,7 @@ export const CustomerScreen: FC<CustomerScreenProps> = observer(function Custome
       {/* divider */}
       <DividerLine />
 
+      {/* customer result list */}
       <View style={$viewContainer}>
         <Text style={$title}>{selectedUserType} Users</Text>
 
@@ -101,9 +120,9 @@ export const CustomerScreen: FC<CustomerScreenProps> = observer(function Custome
             style={{
               height: "100%",
             }}
-            data={filteredCustomers} // Use filteredCustomers instead of customers
-            keyExtractor={(item: ICustomer) => item.id.toString()} // Ensuring correct type
-            renderItem={({ item }) => <CustomerCard item={item} spacing={spacing} />}
+            data={filteredCustomers}
+            keyExtractor={(item: ICustomer) => item.id.toString()}
+            renderItem={({ item }) => <CustomerCard item={item} />}
             onRefresh={onRefresh}
             refreshing={refreshing}
             showsVerticalScrollIndicator={false}

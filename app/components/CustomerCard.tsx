@@ -1,15 +1,9 @@
 import React from "react"
 import { View, Text, ViewStyle, TextStyle } from "react-native"
 import { ICustomer } from "../models/Customer"
-
+import { spacing } from "../theme"
 // Component that accepts item and spacing as props
-const CustomerCard = ({
-  item,
-  spacing,
-}: {
-  item: ICustomer
-  spacing: { xl: number; md: number; sm: number }
-}) => {
+const CustomerCard = ({ item }: { item: ICustomer }) => {
   return (
     <View style={[$container, { marginTop: spacing.xl }]}>
       {/* Icon with the first char of name */}

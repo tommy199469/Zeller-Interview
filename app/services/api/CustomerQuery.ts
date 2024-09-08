@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client"
 
 const getCustomerQuery = gql`
-  query ListZellerCustomers($role: String!) {
+  query ListZellerCustomers($role: String) {
     listZellerCustomers(filter: { role: { eq: $role } }) {
       items {
         id
