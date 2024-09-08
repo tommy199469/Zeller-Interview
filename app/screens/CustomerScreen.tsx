@@ -1,4 +1,3 @@
-import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useState } from "react"
 import { View, Text, ViewStyle, TextStyle, ActivityIndicator, FlatList } from "react-native"
 import { TabScreenProps } from "../navigators"
@@ -12,7 +11,7 @@ interface CustomerScreenProps extends TabScreenProps<"Customer"> {}
 
 const userTypes: string[] = ["Admin", "Manager"]
 
-export const CustomerScreen: FC<CustomerScreenProps> = observer(function CustomerScreenScreen() {
+export const CustomerScreen: FC<CustomerScreenProps> = function CustomerScreenScreen() {
   // for the radio selection
   const [selectedUserType, setSelectedUserType] = useState<string>("Admin")
 
@@ -48,7 +47,7 @@ export const CustomerScreen: FC<CustomerScreenProps> = observer(function Custome
       setFilteredCustomers([])
       setSearchText("")
     }
-  }, [data])
+  }, [data, selectedUserType])
 
   // Filter customers based on the search text
   const filterCustomers = (text: string) => {
@@ -78,7 +77,7 @@ export const CustomerScreen: FC<CustomerScreenProps> = observer(function Custome
   return (
     <Screen preset="fixed" style={$container} safeAreaEdges={["top"]}>
       {/* the radio selection */}
-      <View style={$viewContainer}>
+      <View style={$viewContainer} testID="container">
         <Text style={$title}>User Types</Text>
         <RadioGroup
           options={userTypes}
@@ -112,11 +111,12 @@ export const CustomerScreen: FC<CustomerScreenProps> = observer(function Custome
         )}
 
         {/* if calling the graphql show the loading icon */}
-        {loading && <ActivityIndicator />}
+        {loading && <ActivityIndicator testID="ActivityIndicator" />}
 
         {/* show the result list */}
         {!loading && (
           <FlatList
+            testID="customer-list"
             style={{
               height: "100%",
             }}
@@ -131,7 +131,7 @@ export const CustomerScreen: FC<CustomerScreenProps> = observer(function Custome
       </View>
     </Screen>
   )
-})
+}
 
 const $container: ViewStyle = {
   flex: 1,

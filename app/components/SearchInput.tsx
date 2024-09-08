@@ -12,6 +12,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({ value, onChangeText, p
   return (
     <View style={$searchContainer}>
       <TextInput
+        testID="search_input"
         style={$searchInput}
         value={value}
         onChangeText={onChangeText}

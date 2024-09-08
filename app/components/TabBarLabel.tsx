@@ -1,6 +1,6 @@
 import { colors } from "app/theme"
 import React from "react"
-import { Text, Image, TouchableOpacity } from "react-native"
+import { Text, Image } from "react-native"
 
 // to align the color for label and icon
 const getColor = (focused: boolean) => {
@@ -31,9 +31,11 @@ const TabBarIcon = ({
   size?: number
 }) => {
   return (
-    <TouchableOpacity>
-      <Image style={{ tintColor: getColor(focused), width: size, height: size }} source={source} />
-    </TouchableOpacity>
+    <Image
+      testID="icon"
+      style={{ tintColor: getColor(focused), width: size, height: size }}
+      source={source}
+    />
   )
 }
 

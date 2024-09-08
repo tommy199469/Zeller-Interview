@@ -1,4 +1,4 @@
-const HomeIcon = require("./home.png")
-const CustomerIcon = require("./customer.png")
+const HomeIcon = require("./Icons/home.png")
+const CustomerIcon = require("./Icons/customer.png")
 
 export { HomeIcon, CustomerIcon }

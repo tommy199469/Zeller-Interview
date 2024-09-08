@@ -5,6 +5,7 @@ import { spacing } from "../theme"
 const DividerLine = () => {
   return (
     <View
+      testID="divider-line"
       style={{
         width: "80%",
         height: 1,
