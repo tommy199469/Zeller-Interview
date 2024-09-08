@@ -81,10 +81,6 @@ This is a great place to put miscellaneous helpers and utilities. Things like da
 
 **app.tsx** This is the entry point to your app. This is where you will find the main App component which renders the rest of the application.
 
-### ./assets directory
-
-This directory is designed to organize and store various assets, making it easy for you to manage and use them in your application. The assets are further categorized into subdirectories, including `icons` and `images`:
-
 # Start your application
 
 1. create .env and follow the structure of the .env.example
@@ -106,4 +102,16 @@ For Andriod:
 
 ```
 yarn andriod
+```
+
+4. Run test cases
+
+```
+jest test
+```
+
+if you want see more details
+
+```
+jest test --verbose true
 ```
