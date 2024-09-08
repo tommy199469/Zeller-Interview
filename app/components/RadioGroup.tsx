@@ -1,4 +1,4 @@
-import React, { FC } from "react"
+import React, { FC, useMemo } from "react"
 import { View, ViewStyle, Text, TextStyle, TouchableOpacity } from "react-native"
 import { RadioButton } from "react-native-paper"
 import { spacing } from "../theme"
@@ -10,25 +10,22 @@ interface RadioGroupProps {
 }
 
 export const RadioGroup: FC<RadioGroupProps> = ({ options, selectedValue, onValueChange }) => {
-  return (
-    <View style={$radioGroupContainer}>
-      {options.map((option) => (
-        <TouchableOpacity
-          key={option}
+  // reduce the rendering
+  const renderedOptions = useMemo(() => {
+    return options.map((option) => (
+      <TouchableOpacity key={option} onPress={() => onValueChange(option)} style={$radioContainer}>
+        <RadioButton.Android
+          value={option}
+          status={selectedValue === option ? "checked" : "unchecked"}
           onPress={() => onValueChange(option)}
-          style={$radioContainer}
-        >
-          <RadioButton.Android
-            value={option}
-            status={selectedValue === option ? "checked" : "unchecked"}
-            onPress={() => onValueChange(option)}
-            color="#0171ce"
-          />
-          <Text style={$radioText}>{option}</Text>
-        </TouchableOpacity>
-      ))}
-    </View>
-  )
+          color="#0171ce"
+        />
+        <Text style={$radioText}>{option}</Text>
+      </TouchableOpacity>
+    ))
+  }, [options, selectedValue, onValueChange])
+
+  return <View style={$radioGroupContainer}>{renderedOptions}</View>
 }
 
 const $radioGroupContainer: ViewStyle = {

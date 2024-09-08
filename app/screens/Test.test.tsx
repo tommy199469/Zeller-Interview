@@ -1,17 +1,34 @@
 import React from "react"
-import { render, waitFor, fireEvent } from "@testing-library/react-native"
-import { CustomerScreen } from "./CustomerScreen"
+import { render, fireEvent, waitFor, act } from "@testing-library/react-native"
 import { MockedProvider } from "@apollo/client/testing"
-import { getCustomerQuery } from "../services/api"
-import { CompositeNavigationProp } from "@react-navigation/native"
-import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { TabParamList, AppStackParamList } from "../navigators"
-import { RouteProp } from "@react-navigation/native"
-import { SafeAreaProvider } from "react-native-safe-area-context"
-import { act } from "@testing-library/react-native"
+import { CustomerScreen } from "../screens/CustomerScreen"
+import { getCustomerQuery } from "../services/api" // The GraphQL query
+import { NavigationContainer } from "@react-navigation/native"
+import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context"
 
-// Define mock data for different query responses
+// Mock Data for the GraphQL query
+const mockCustomers = [
+  {
+    id: 1,
+    name: "Alice",
+    role: "Admin",
+    email: "alice@zeller.com",
+  },
+  {
+    id: 2,
+    name: "Bob",
+    role: "Manager",
+    email: "bob@zeller.com",
+  },
+  {
+    id: 3,
+    name: "Thomas",
+    role: "Manager",
+    email: "thomas@zeller.com",
+  },
+]
+
+// Mock the query result for `getCustomerQuery`
 const mocks = [
   {
     request: {
@@ -21,136 +38,133 @@ const mocks = [
     result: {
       data: {
         listZellerCustomers: {
-          items: [
-            {
-              id: "1",
-              name: "John Doe",
-              email: "john@example.com",
-              role: "Admin",
-            },
-            {
-              id: "2",
-              name: "Jane Smith",
-              email: "jane@example.com",
-              role: "Manager",
-            },
-          ],
+          items: mockCustomers,
+          nextToken: null,
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: getCustomerQuery,
+      variables: { role: "Manager" },
+    },
+    result: {
+      data: {
+        listZellerCustomers: {
+          items: mockCustomers,
+          nextToken: null,
         },
       },
     },
   },
 ]
 
-const mockedNavigate = jest.fn()
-
-jest.mock("@react-navigation/native", () => ({
-  useNavigation: () => ({ navigate: mockedNavigate }),
-}))
-
-const mockNavigation: CompositeNavigationProp<
-  BottomTabNavigationProp<TabParamList, "Customer">,
-  NativeStackNavigationProp<AppStackParamList, "Default">
-> = {
+// Mock navigation and route props
+const mockNavigation = {
   navigate: jest.fn(),
   goBack: jest.fn(),
-  replace: jest.fn(),
-  push: jest.fn(),
-  pop: jest.fn(),
-  popToTop: jest.fn(),
-} as any
+  setOptions: jest.fn(),
+  addListener: jest.fn(),
+}
 
-// Define the mock route
-const mockRoute: RouteProp<TabParamList, "Customer"> = {
-  key: "Customer",
+const mockRoute = {
+  key: "CustomerScreen",
   name: "Customer",
 }
 
-describe("CustomerScreen", () => {
-  // Test rendering the CustomerScreen
-  it("renders the Customer Screen correctly", async () => {
-    const wrapper = render(
-      <SafeAreaProvider initialSafeAreaInsets={{ top: 1, left: 2, right: 3, bottom: 4 }}>
+// mock the SafeAreaProvider
+jest.mock(
+  "react-native-safe-area-context",
+  () => require("react-native-safe-area-context/jest/mock").default,
+)
+
+describe("CustomerScreen with Mocked GraphQL", () => {
+  // Render the screen inside an ApolloProvider, SafeAreaProvider, and NavigationContainer
+  const setup = () =>
+    render(
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
         <MockedProvider mocks={mocks} addTypename={false}>
-          <CustomerScreen navigation={mockNavigation} route={mockRoute} />
+          <NavigationContainer>
+            <CustomerScreen navigation={mockNavigation as any} route={mockRoute as any} />
+          </NavigationContainer>
         </MockedProvider>
       </SafeAreaProvider>,
     )
 
-    // Use waitFor to wait for async data to load
-    await waitFor(() => expect(wrapper.queryByText("Admin Users")).toBeDefined())
+  test("renders the CustomerScreen and shows 'Admin' users", async () => {
+    const { getByText, queryByText } = setup()
 
-    // console.log("check the admin users", wrapper.queryByText("Admin Users"))
+    // Test RadioGroup with Admin and Manager options
+    expect(getByText("Admin")).toBeDefined()
+    expect(getByText("Manager")).toBeDefined()
+
+    // By default, "Admin" should be selected, and "Alice" should appear
+    await waitFor(() => {
+      expect(getByText("Alice")).toBeDefined()
+    })
+
+    // "Bob" should not appear for "Admin"
+    expect(queryByText("Bob")).toBeNull()
   })
 
-  //   // Test filtering customers based on search text
-  //   it("filters customers based on search text", async () => {
-  //     const { queryByTestId, queryByText } = render(
-  //       <SafeAreaProvider>
-  //         <MockedProvider mocks={mocks} addTypename={false}>
-  //           <CustomerScreen navigation={mockNavigation} route={mockRoute} />
-  //         </MockedProvider>
-  //       </SafeAreaProvider>,
-  //     )
+  test("changes user type to Manager and shows 'Bob'", async () => {
+    const { getByText, queryByText } = setup()
 
-  //     await waitFor(() => [
-  //       expect(queryByText("John Doe")).toBeDefined(),
-  //       expect(queryByText("Jane Smith")).toBeDefined(),
-  //     ])
+    // By default, "Admin" should be selected, and "Alice" should appear
+    await waitFor(() => {
+      expect(getByText("Alice")).toBeDefined()
+    })
 
-  //     // Check if the search input is rendered
-  //     const searchInput = queryByTestId("search-input")
-  //     expect(searchInput).toBeDefined()
+    // "Bob" should not appear for "Admin"
+    expect(queryByText("Bob")).toBeNull()
 
-  //     console.log("searchInput", searchInput)
+    // Change user type to "Manager"
+    fireEvent.press(getByText("Manager"))
 
-  //     // Simulate typing "Jane" into the search input
-  //     fireEvent.changeText(searchInput, "Jane")
+    // Wait for the list to update
+    await waitFor(() => {
+      expect(getByText("Bob")).toBeDefined()
+    })
 
-  //     // Verify that "Jane Smith" is shown and "John Doe" is not displayed
-  //     expect(queryByText("John Doe")).toBeNull()
-  //     expect(queryByText("Jane Smith")).toBeDefined()
-  //   })
+    // "Alice" should no longer be shown when "Manager" is selected
+    expect(queryByText("Alice")).toBeNull()
+  })
 
-  //   // Test changing user type and refetching data
-  //   it("changes the user type and refetches data correctly", async () => {
-  //     const { getByText, queryByText } = render(
-  //       <SafeAreaProvider>
-  //         <MockedProvider mocks={mocks} addTypename={false}>
-  //           <CustomerScreen navigation={mockNavigation} route={mockRoute} />
-  //         </MockedProvider>
-  //       </SafeAreaProvider>,
-  //     )
+  test("changes user type to Manager and input 'Thomas' in the search input", async () => {
+    const { getByText, queryByText, getByTestId } = setup()
 
-  //     // Wait for the "Admin" users to be loaded
-  //     await waitFor(() => expect(queryByText("John Doe")).toBeDefined())
-  //     await waitFor(() => expect(queryByText("Jane Smith")).toBeDefined())
+    // By default, "Admin" should be selected, and "Alice" should appear
+    await waitFor(() => {
+      expect(getByText("Alice")).toBeDefined()
+    })
 
-  //     // Change the user type to "Manager"
-  //     fireEvent.press(getByText("Manager"))
+    // "Bob" should not appear for "Admin"
+    expect(queryByText("Bob")).toBeNull()
 
-  //     // After changing the user type, "Jane Smith" should be the only user visible
-  //     await waitFor(() => expect(queryByText("John Doe")).toBeNull())
-  //     await waitFor(() => expect(queryByText("Jane Smith")).toBeDefined())
-  //   })
+    // Change user type to "Manager"
+    fireEvent.press(getByText("Manager"))
 
-  //   // Test pulling to refresh the list of customers
-  //   it("refreshes the customer list when pulled down", async () => {
-  //     const { getByTestId, queryByText } = render(
-  //       <SafeAreaProvider>
-  //         <MockedProvider mocks={mocks} addTypename={false}>
-  //           <CustomerScreen navigation={mockNavigation} route={mockRoute} />
-  //         </MockedProvider>
-  //       </SafeAreaProvider>,
-  //     )
+    // Wait for the list to update
+    await waitFor(() => {
+      expect(getByText("Bob")).toBeDefined(), expect(getByText("Thomas")).toBeDefined()
+    })
 
-  //     // Wait for the initial data to load
-  //     await waitFor(() => expect(queryByText("John Doe")).toBeDefined())
+    // "Alice" should no longer be shown when "Manager" is selected
+    expect(queryByText("Alice")).toBeNull()
 
-  //     // Simulate pulling down to refresh
-  //     const flatList = getByTestId("customer-list")
-  //     fireEvent(flatList, "refresh")
+    // check the input is exist first
+    await waitFor(() => {
+      expect(getByTestId("search_input")).toBeDefined()
+    })
 
-  //     // After refresh, ensure that the same data is still visible
-  //     await waitFor(() => expect(queryByText("John Doe")).toBeDefined())
-  //   })
+    // input Thomas
+    await act(async () => {
+      fireEvent.changeText(getByTestId("search_input"), "Thomas")
+    })
+
+    // "Bob" should not appear after input the search and only show Thomas
+    expect(queryByText("Bob")).toBeNull()
+    expect(getByText("Thomas")).toBeDefined()
+  })
 })

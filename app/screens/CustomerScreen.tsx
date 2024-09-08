@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react"
+import React, { FC, useEffect, useState, useMemo } from "react"
 import { View, Text, ViewStyle, TextStyle, ActivityIndicator, FlatList } from "react-native"
 import { TabScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
@@ -15,54 +15,48 @@ export const CustomerScreen: FC<CustomerScreenProps> = function CustomerScreenSc
   // for the radio selection
   const [selectedUserType, setSelectedUserType] = useState<string>("Admin")
 
-  // set the initial customer list
-  const [customers, setCustomers] = useState<ICustomer[]>([])
-
-  // after searched customer list
-  const [filteredCustomers, setFilteredCustomers] = useState<ICustomer[]>([])
-
   // the search text
   const [searchText, setSearchText] = useState<string>("")
 
   // for the pulling to update
   const [refreshing, setRefreshing] = useState(false)
 
+  // GraphQL query to fetch customer data based on role
   const { data, loading, error, refetch } = useQuery(getCustomerQuery, {
     variables: { role: selectedUserType },
   })
 
-  useEffect(() => {
+  const customers = useMemo(() => {
     if (data?.listZellerCustomers?.items) {
-      setSearchText("")
-      const customerList = data?.listZellerCustomers?.items.filter(
+      return data.listZellerCustomers.items.filter(
         (item: ICustomer) => item.role === selectedUserType,
       )
-      setCustomers(customerList)
-      setFilteredCustomers(customerList)
     }
-
-    // reset the data when unmount the component
-    return () => {
-      setCustomers([])
-      setFilteredCustomers([])
-      setSearchText("")
-    }
+    return []
   }, [data, selectedUserType])
 
-  // Filter customers based on the search text
-  const filterCustomers = (text: string) => {
-    setSearchText(text)
-    if (text) {
-      const filteredList = customers.filter((customer) =>
-        customer.name.toLowerCase().includes(text.toLowerCase()),
+  // Memoize the filtered customer list based on search text
+  const filteredCustomers = useMemo(() => {
+    if (searchText) {
+      return customers.filter((customer: ICustomer) =>
+        customer.name.toLowerCase().includes(searchText.toLowerCase()),
       )
-      setFilteredCustomers(filteredList)
-    } else {
-      setFilteredCustomers(customers)
     }
-  }
+    return customers
+  }, [customers, searchText])
 
-  // pull to update in the flat list
+  const userTypeTitle = useMemo(() => {
+    return <Text style={$title}>{selectedUserType} Users</Text>
+  }, [selectedUserType])
+
+  // Reset the data when unmounting the component
+  useEffect(() => {
+    return () => {
+      setSearchText("")
+    }
+  }, [])
+
+  // Handle refreshing the customer list
   const onRefresh = async () => {
     setRefreshing(true)
     try {
@@ -91,20 +85,19 @@ export const CustomerScreen: FC<CustomerScreenProps> = function CustomerScreenSc
 
       {/* customer result list */}
       <View style={$viewContainer}>
-        <Text style={$title}>{selectedUserType} Users</Text>
-
+        {userTypeTitle}
         {error && <Text>{error?.message || "Cannot fetch data from server"}</Text>}
 
         {/* Search Input */}
         {customers.length > 0 && (
           <SearchInput
             value={searchText}
-            onChangeText={filterCustomers}
+            onChangeText={setSearchText}
             placeholder="Search by name"
           />
         )}
         {/* if no customer found from graphql */}
-        {customers.length === 0 && (
+        {customers.length === 0 && !loading && (
           <Text style={[$title, { marginTop: spacing.xl, color: "grey", textAlign: "center" }]}>
             No Customer Found
           </Text>
