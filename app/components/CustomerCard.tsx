@@ -1,12 +1,13 @@
 import React from "react"
-import { View, Text, StyleSheet, ViewStyle, TextStyle } from "react-native"
+import { View, Text, ViewStyle, TextStyle } from "react-native"
+import { ICustomer } from "../models/Customer"
 
 // Component that accepts item and spacing as props
 const CustomerCard = ({
   item,
   spacing,
 }: {
-  item: { name: string; role: string }
+  item: ICustomer
   spacing: { xl: number; md: number; sm: number }
 }) => {
   return (

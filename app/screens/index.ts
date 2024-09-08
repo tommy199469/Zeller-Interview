@@ -1,2 +1,2 @@
 export * from "./CustomerScreen"
-// export other screens here
+export * from "./HomeScreen"

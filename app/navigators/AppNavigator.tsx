@@ -11,10 +11,9 @@ import React from "react"
 import { useColorScheme } from "react-native"
 import * as Screens from "../screens"
 import Config from "../config"
-import { useStores } from "../models" // @demo remove-current-line
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { colors } from "../theme"
-
+import { TabNavigator } from "./NavigationBar"
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
  * as well as what properties (if any) they might take when navigating to them.
@@ -29,7 +28,7 @@ import { colors } from "../theme"
  *   https://reactnavigation.org/docs/typescript/#organizing-types
  */
 export type AppStackParamList = {
-  Customer: undefined
+  Default: undefined
 }
 
 /**
@@ -51,9 +50,9 @@ const AppStack = observer(function AppStack() {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false, navigationBarColor: colors.background }}
-      initialRouteName={"Customer"} // @demo remove-current-line
+      initialRouteName={"Default"} // @demo remove-current-line
     >
-      <Stack.Screen name="Customer" component={Screens.CustomerScreen} />
+      <Stack.Screen name="Default" component={TabNavigator} />
     </Stack.Navigator>
   )
 })
