@@ -100,24 +100,25 @@ describe("CustomerScreen with Mocked GraphQL", () => {
     expect(getByText("Manager")).toBeDefined()
 
     // By default, "Admin" should be selected, and "Alice" should appear
-    await waitFor(() => {
+    await waitFor(async () => {
       expect(getByText("Alice")).toBeDefined()
     })
 
     // "Bob" should not appear for "Admin"
-    expect(queryByText("Bob")).toBeNull()
+    await waitFor(async () => {
+      expect(queryByText("Bob")).toBeNull()
+    })
   })
 
   test("changes user type to Manager and shows 'Bob'", async () => {
     const { getByText, queryByText } = setup()
 
-    // By default, "Admin" should be selected, and "Alice" should appear
     await waitFor(() => {
+      // By default, "Admin" should be selected, and "Alice" should appear
       expect(getByText("Alice")).toBeDefined()
+      // "Bob" should not appear for "Admin"
+      expect(queryByText("Bob")).toBeNull()
     })
-
-    // "Bob" should not appear for "Admin"
-    expect(queryByText("Bob")).toBeNull()
 
     // Change user type to "Manager"
     await act(async () => {
@@ -127,22 +128,23 @@ describe("CustomerScreen with Mocked GraphQL", () => {
     // Wait for the list to update
     await waitFor(() => {
       expect(getByText("Bob")).toBeDefined()
-    })
 
-    // "Alice" should no longer be shown when "Manager" is selected
-    expect(queryByText("Alice")).toBeNull()
+      // "Alice" should no longer be shown when "Manager" is selected
+      expect(queryByText("Alice")).toBeNull()
+    })
   })
 
   test("changes user type to Manager and input 'Thomas' in the search input", async () => {
     const { getByText, queryByText, getByTestId } = setup()
 
-    // By default, "Admin" should be selected, and "Alice" should appear
     await waitFor(() => {
-      expect(getByText("Alice")).toBeDefined()
-    })
+      // By default, "Admin" should be selected, and "Alice" should appear
 
-    // "Bob" should not appear for "Admin"
-    expect(queryByText("Bob")).toBeNull()
+      expect(getByText("Alice")).toBeDefined()
+
+      // "Bob" should not appear for "Admin"
+      expect(queryByText("Bob")).toBeNull()
+    })
 
     // Change user type to "Manager"
     await act(async () => {
@@ -151,24 +153,27 @@ describe("CustomerScreen with Mocked GraphQL", () => {
 
     // Wait for the list to update
     await waitFor(() => {
-      expect(getByText("Bob")).toBeDefined(), expect(getByText("Thomas")).toBeDefined()
+      expect(getByText("Bob")).toBeDefined()
+      expect(getByText("Thomas")).toBeDefined()
+
+      // "Alice" should no longer be shown when "Manager" is selected
+      expect(queryByText("Alice")).toBeNull()
     })
 
-    // "Alice" should no longer be shown when "Manager" is selected
-    expect(queryByText("Alice")).toBeNull()
-
-    // check the input is exist first
+    // Check the input is present
     await waitFor(() => {
       expect(getByTestId("search_input")).toBeDefined()
     })
 
-    // input Thomas
+    // Input 'Thomas' into the search field
     await act(async () => {
       fireEvent.changeText(getByTestId("search_input"), "Thomas")
     })
 
-    // "Bob" should not appear after input the search and only show Thomas
-    expect(queryByText("Bob")).toBeNull()
-    expect(getByText("Thomas")).toBeDefined()
+    // Ensure only 'Thomas' is shown and 'Bob' is hidden
+    await waitFor(async () => {
+      expect(queryByText("Bob")).toBeNull()
+      expect(getByText("Thomas")).toBeDefined()
+    })
   })
 })
