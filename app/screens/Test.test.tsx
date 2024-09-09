@@ -120,7 +120,9 @@ describe("CustomerScreen with Mocked GraphQL", () => {
     expect(queryByText("Bob")).toBeNull()
 
     // Change user type to "Manager"
-    fireEvent.press(getByText("Manager"))
+    await act(async () => {
+      fireEvent.press(getByText("Manager"))
+    })
 
     // Wait for the list to update
     await waitFor(() => {
@@ -143,7 +145,9 @@ describe("CustomerScreen with Mocked GraphQL", () => {
     expect(queryByText("Bob")).toBeNull()
 
     // Change user type to "Manager"
-    fireEvent.press(getByText("Manager"))
+    await act(async () => {
+      fireEvent.press(getByText("Manager"))
+    })
 
     // Wait for the list to update
     await waitFor(() => {

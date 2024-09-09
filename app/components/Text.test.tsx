@@ -1,5 +1,5 @@
 import React from "react"
-import { render, fireEvent } from "@testing-library/react-native"
+import { render, fireEvent, act } from "@testing-library/react-native"
 import { CustomerCard, DividerLine, RadioGroup, SearchInput, TabBarIcon, TabBarLabel } from "./"
 import { ICustomer } from "../models/Customer"
 import { HomeIcon } from "../assets"
@@ -58,11 +58,14 @@ describe("RadioGroup", () => {
     expect(queryByText("Option 3")).toBeNull()
   })
 
-  it("triggers onValueChange when an option is selected", () => {
+  it("triggers onValueChange when an option is selected", async () => {
     const { getByText } = render(
       <RadioGroup options={options} selectedValue={selectedValue} onValueChange={onValueChange} />,
     )
-    fireEvent.press(getByText("Option 2"))
+
+    await act(async () => {
+      fireEvent.press(getByText("Option 2"))
+    })
     expect(onValueChange).toHaveBeenCalledWith("Option 2")
   })
 })
@@ -78,11 +81,13 @@ describe("SearchInput", () => {
     expect(getByPlaceholderText("Search...")).toBeDefined()
   })
 
-  it("updates the value when text is entered", () => {
+  it("updates the value when text is entered", async () => {
     const { getByPlaceholderText } = render(
       <SearchInput value="" onChangeText={onChangeText} placeholder="Search..." />,
     )
-    fireEvent.changeText(getByPlaceholderText("Search..."), "test input")
+    await act(async () => {
+      fireEvent.changeText(getByPlaceholderText("Search..."), "test input")
+    })
     expect(onChangeText).toHaveBeenCalledWith("test input")
   })
 })
