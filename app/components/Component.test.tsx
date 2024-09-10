@@ -118,11 +118,33 @@ describe("SearchInput", () => {
 })
 
 describe("TabBarLabel", () => {
-  it("renders TabBarLabel with correct text", async () => {
+  it("renders TabBarLabel with correct text (focused)", async () => {
     const { getByText } = render(<TabBarLabel text="Home" focused={true} />)
 
     await waitFor(() => {
-      expect(getByText("Home")).toBeDefined()
+      const text = getByText("Home")
+      expect(text).toBeDefined()
+      expect(text.props.style.color).toBe(colors.tint)
+    })
+  })
+
+  it("renders TabBarLabel with correct text (not focus)", async () => {
+    const { getByText } = render(<TabBarLabel text="Home" focused={false} />)
+
+    await waitFor(() => {
+      const text = getByText("Home")
+      expect(text).toBeDefined()
+      expect(text.props.style.color).toBe(colors.text)
+    })
+  })
+
+  it("test the label is empty", async () => {
+    const { getByText } = render(<TabBarLabel text="" focused={false} />)
+
+    await waitFor(() => {
+      const text = getByText("")
+      expect(text).toBeDefined()
+      expect(text.props.style.color).toBe(colors.text)
     })
   })
 })
@@ -130,7 +152,7 @@ describe("TabBarLabel", () => {
 describe("TabBarIcon", () => {
   const source = HomeIcon
 
-  it("renders TabBarIcon with correct size and tint color", async () => {
+  it("renders TabBarIcon with correct size and tint color (focused)", async () => {
     const { getByTestId } = render(<TabBarIcon source={source} focused={true} size={30} />)
 
     await waitFor(() => {
@@ -138,6 +160,28 @@ describe("TabBarIcon", () => {
       expect(image.props.style.width).toBe(30)
       expect(image.props.style.height).toBe(30)
       expect(image.props.style.tintColor).toBe(colors.tint)
+    })
+  })
+
+  it("renders TabBarIcon with correct size and tint color (not focus)", async () => {
+    const { getByTestId } = render(<TabBarIcon source={source} focused={false} size={0} />)
+
+    await waitFor(() => {
+      const image = getByTestId("icon")
+      expect(image.props.style.width).toBe(0)
+      expect(image.props.style.height).toBe(0)
+      expect(image.props.style.tintColor).toBe(colors.text)
+    })
+  })
+
+  it("test the negative number for the width and height", async () => {
+    const { getByTestId } = render(<TabBarIcon source={source} focused={false} size={-1} />)
+
+    await waitFor(() => {
+      const image = getByTestId("icon")
+      expect(image.props.style.width).toBe(-1)
+      expect(image.props.style.height).toBe(-1)
+      expect(image.props.style.tintColor).toBe(colors.text)
     })
   })
 })
