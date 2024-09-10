@@ -98,10 +98,10 @@ For IOS:
 yarn ios
 ```
 
-For Andriod:
+For Android:
 
 ```
-yarn andriod
+yarn android
 ```
 
 4. Run test cases
