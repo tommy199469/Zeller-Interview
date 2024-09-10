@@ -53,4 +53,5 @@ const $nameText: TextStyle = {
 const $roleText: TextStyle = {
   color: "grey",
   fontSize: 14,
+  textTransform: "capitalize",
 }

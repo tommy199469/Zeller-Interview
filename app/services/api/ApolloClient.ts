@@ -17,11 +17,10 @@ const httpLink = createHttpLink({
 
 // handle the api key
 const authLink = setContext((_, { headers }) => {
-  const token = "your-auth-token" // Replace with your authentication token
   return {
     headers: {
       ...headers,
-      "x-api-key": Config.graphqlApiKey ? `Bearer ${token}` : "",
+      "x-api-key": Config.graphqlApiKey,
     },
   }
 })

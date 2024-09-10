@@ -19,16 +19,22 @@ const CustomerList = ({
   // for the pulling to update
   const [refreshing, setRefreshing] = useState(false)
 
+  console.log(selectedUserType.toUpperCase())
+
   // GraphQL query to fetch customer data based on role
   const { data, loading, error, refetch } = useQuery(getCustomerQuery, {
-    variables: { role: selectedUserType },
+    variables: { role: selectedUserType.toUpperCase() },
   })
 
   const customers = useMemo(() => {
     if (data?.listZellerCustomers?.items) {
-      return data.listZellerCustomers.items.filter(
-        (item: ICustomer) => item.role === selectedUserType,
-      )
+      // it needs to do the filtering for the mock server in local
+      // return data.listZellerCustomers.items.filter(
+      //   (item: ICustomer) => item.role.toLocaleUpperCase() === selectedUserType.toLocaleUpperCase(),
+      // )
+
+      // if you calling the production one, it does not need to do the filtering
+      return data.listZellerCustomers.items
     }
     return []
   }, [data, selectedUserType])
