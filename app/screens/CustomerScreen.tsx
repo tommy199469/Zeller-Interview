@@ -6,11 +6,11 @@ import { $container, $title, $viewContainer } from "../styles"
 
 interface CustomerScreenProps extends TabScreenProps<"Customer"> {}
 
-const userTypes: string[] = ["Admin", "Manager"]
+const userTypes: string[] = ["admin", "manager"]
 
 export const CustomerScreen: FC<CustomerScreenProps> = function CustomerScreenScreen() {
   // for the radio selection
-  const [selectedUserType, setSelectedUserType] = useState<string>("Admin")
+  const [selectedUserType, setSelectedUserType] = useState<string>("admin")
 
   // the search text
   const [searchText, setSearchText] = useState<string>("")
@@ -30,7 +30,7 @@ export const CustomerScreen: FC<CustomerScreenProps> = function CustomerScreenSc
         <RadioGroup
           options={userTypes}
           selectedValue={selectedUserType}
-          onValueChange={(value) => setSelectedUserType(value)}
+          onValueChange={setSelectedUserType}
         />
       </View>
 

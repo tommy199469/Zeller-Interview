@@ -19,8 +19,6 @@ const CustomerList = ({
   // for the pulling to update
   const [refreshing, setRefreshing] = useState(false)
 
-  console.log(selectedUserType.toUpperCase())
-
   // GraphQL query to fetch customer data based on role
   const { data, loading, error, refetch } = useQuery(getCustomerQuery, {
     variables: { role: selectedUserType.toUpperCase() },
@@ -37,7 +35,7 @@ const CustomerList = ({
       return data.listZellerCustomers.items
     }
     return []
-  }, [data, selectedUserType])
+  }, [data])
 
   // Memoize the filtered customer list based on search text
   const filteredCustomers = useMemo(() => {
@@ -52,13 +50,6 @@ const CustomerList = ({
   const userTypeTitle = useMemo(() => {
     return <Text style={$title}>{selectedUserType} Users</Text>
   }, [selectedUserType])
-
-  // Reset the data when unmounting the component
-  useEffect(() => {
-    return () => {
-      setSearchText("")
-    }
-  }, [])
 
   // Handle refreshing the customer list
   const onRefresh = async () => {

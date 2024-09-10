@@ -14,6 +14,7 @@ const $viewContainer: ViewStyle = {
 const $title: TextStyle = {
   fontWeight: "600",
   fontSize: 24,
+  textTransform: "capitalize",
 }
 
 export { $container, $title, $viewContainer }
