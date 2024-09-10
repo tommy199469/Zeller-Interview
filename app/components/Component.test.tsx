@@ -1,6 +1,6 @@
 import React from "react"
 import { render, fireEvent, waitFor, act } from "@testing-library/react-native"
-import { CustomerCard, DividerLine, RadioGroup, SearchInput, TabBarIcon, TabBarLabel } from "./"
+import { CustomerCard, DividerLine, RadioGroup, SearchInput, TabBarIcon, TabBarLabel } from "."
 import { ICustomer } from "../models/Customer"
 import { HomeIcon } from "../assets"
 import { colors } from "app/theme"
@@ -26,7 +26,7 @@ describe("CustomerCard", () => {
     const customer: ICustomer = {
       id: "001",
       name: "Alice",
-      role: "Developer",
+      role: "Manager",
       email: "test@zeller.com",
     }
 

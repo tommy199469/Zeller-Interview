@@ -89,3 +89,5 @@ web-build/
 
 
 .env
+
+*/**/__snapshots__

@@ -1,44 +1,29 @@
 import React from "react"
 import { render, fireEvent, waitFor, act } from "@testing-library/react-native"
 import { MockedProvider } from "@apollo/client/testing"
-import { CustomerScreen } from "../screens/CustomerScreen"
+import { CustomerScreen } from "./CustomerScreen"
 import { getCustomerQuery } from "../services/api" // The GraphQL query
 import { NavigationContainer } from "@react-navigation/native"
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context"
-
-// Mock Data for the GraphQL query
-const mockCustomers = [
-  {
-    id: 1,
-    name: "Alice",
-    role: "Admin",
-    email: "alice@zeller.com",
-  },
-  {
-    id: 2,
-    name: "Bob",
-    role: "Manager",
-    email: "bob@zeller.com",
-  },
-  {
-    id: 3,
-    name: "Thomas",
-    role: "Manager",
-    email: "thomas@zeller.com",
-  },
-]
 
 // Mock the query result for `getCustomerQuery`
 const mocks = [
   {
     request: {
       query: getCustomerQuery,
-      variables: { role: "Admin" },
+      variables: { role: "ADMIN" },
     },
     result: {
       data: {
         listZellerCustomers: {
-          items: mockCustomers,
+          items: [
+            {
+              id: 1,
+              name: "Alice",
+              role: "Admin",
+              email: "alice@zeller.com",
+            },
+          ],
           nextToken: null,
         },
       },
@@ -47,12 +32,25 @@ const mocks = [
   {
     request: {
       query: getCustomerQuery,
-      variables: { role: "Manager" },
+      variables: { role: "MANAGER" },
     },
     result: {
       data: {
         listZellerCustomers: {
-          items: mockCustomers,
+          items: [
+            {
+              id: 2,
+              name: "Bob",
+              role: "Manager",
+              email: "bob@zeller.com",
+            },
+            {
+              id: 3,
+              name: "Thomas",
+              role: "Manager",
+              email: "thomas@zeller.com",
+            },
+          ],
           nextToken: null,
         },
       },
@@ -96,16 +94,16 @@ describe("CustomerScreen with Mocked GraphQL", () => {
     const { getByText, queryByText } = setup()
 
     // Test RadioGroup with Admin and Manager options
-    expect(getByText("Admin")).toBeDefined()
-    expect(getByText("Manager")).toBeDefined()
-
-    // By default, "Admin" should be selected, and "Alice" should appear
     await waitFor(async () => {
-      expect(getByText("Alice")).toBeDefined()
+      expect(getByText("admin")).toBeDefined()
+      expect(getByText("manager")).toBeDefined()
+
+      // By default, "Admin" should be selected, and "Alice" should appear
     })
 
-    // "Bob" should not appear for "Admin"
     await waitFor(async () => {
+      // By default, "Admin" should be selected, and "Alice" should appear
+      expect(getByText("Alice")).toBeDefined()
       expect(queryByText("Bob")).toBeNull()
     })
   })
@@ -122,7 +120,7 @@ describe("CustomerScreen with Mocked GraphQL", () => {
 
     // Change user type to "Manager"
     await act(async () => {
-      fireEvent.press(getByText("Manager"))
+      fireEvent.press(getByText("manager"))
     })
 
     // Wait for the list to update
@@ -139,7 +137,6 @@ describe("CustomerScreen with Mocked GraphQL", () => {
 
     await waitFor(() => {
       // By default, "Admin" should be selected, and "Alice" should appear
-
       expect(getByText("Alice")).toBeDefined()
 
       // "Bob" should not appear for "Admin"
@@ -148,7 +145,7 @@ describe("CustomerScreen with Mocked GraphQL", () => {
 
     // Change user type to "Manager"
     await act(async () => {
-      fireEvent.press(getByText("Manager"))
+      fireEvent.press(getByText("manager"))
     })
 
     // Wait for the list to update
